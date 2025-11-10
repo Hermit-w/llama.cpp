@@ -10021,6 +10021,86 @@ class JanusProVisionModel(MmprojModel):
         return []
 
 
+@ModelBase.register("PI0ForConditionalGeneration")
+class PI0Model(MmprojModel):
+    model_arch = gguf.MODEL_ARCH.PI0
+
+    def __init__(self, *args, **kwargs):
+        # rewrite __init__ to extract vision config
+        ModelBase.__init__(self, *args, **kwargs)
+        self.hparams_vision = None
+
+        # get n_embd of the text model
+        from lerobot.policies.pi0.configuration_pi0 import PI0Config
+        from transformers.models.paligemma import PaliGemmaConfig
+        from transformers.models.gemma import GemmaConfig
+        from transformers.models.siglip import SiglipVisionConfig
+        vlm_config = GemmaConfig(
+            width=2048,
+            depth=18,
+            mlp_dim=16_384,
+            num_heads=8,
+            num_kv_heads=1,
+            head_dim=256,
+        )
+        vlm_config_hf = PaliGemmaConfig()
+        vlm_config_hf._vocab_size = 257152  # noqa: SLF001
+        assert isinstance(vlm_config_hf.text_config, GemmaConfig)
+        assert isinstance(vlm_config_hf.vision_config, SiglipVisionConfig)
+        vlm_config_hf.image_token_index = 257152
+        vlm_config_hf.text_config.hidden_size = vlm_config.width
+        vlm_config_hf.text_config.intermediate_size = vlm_config.mlp_dim
+        vlm_config_hf.text_config.num_attention_heads = vlm_config.num_heads
+        vlm_config_hf.text_config.head_dim = vlm_config.head_dim
+        vlm_config_hf.text_config.num_hidden_layers = vlm_config.depth
+        vlm_config_hf.text_config.num_key_value_heads = vlm_config.num_kv_heads
+        vlm_config_hf.text_config.hidden_activation = "gelu_pytorch_tanh"
+        vlm_config_hf.text_config.torch_dtype = "float32"
+        vlm_config_hf.text_config.vocab_size = 257152
+        vlm_config_hf.text_config.use_adarms = False
+        vlm_config_hf.vision_config.intermediate_size = 4304
+        vlm_config_hf.vision_config.projection_dim = 2048
+        vlm_config_hf.vision_config.projector_hidden_act = "gelu_fast"
+        vlm_config_hf.vision_config.torch_dtype = "float32"
+
+        self.n_embd_text = vlm_config_hf.text_config.hidden_size
+        assert self.n_embd_text > 0, "n_embd not found in hparams"
+
+        # move vision config to the top level, while preserving the original hparams in global_config
+        import copy
+        self.global_config = copy.deepcopy(self.hparams)
+        self.hparams_vision = vlm_config_hf.vision_config.to_dict()
+
+        if self.hparams_vision is None and self.hparams_audio is None:
+            raise ValueError("vision_config / audio_config not found in hparams")
+
+        # for compat with vision-only models
+        self.hparams = self.hparams_vision or self.hparams_audio or self.hparams
+
+        # TODO @ngxson : this is a hack to support both vision and audio encoders
+        self.block_count = vlm_config_hf.text_config.num_hidden_layers
+        self.tensor_map = gguf.get_tensor_name_map(self.model_arch, self.block_count)
+
+        # load preprocessor config
+        self.preprocessor_config = {}
+        with open(self.dir_model / "policy_preprocessor.json", "r", encoding="utf-8") as f:
+            self.preprocessor_config = json.load(f)
+
+        self.postprocessor_config = {}
+        with open(self.dir_model / "policy_postprocessor.json", "r", encoding="utf-8") as f:
+            self.postprocessor_config = json.load(f)
+
+    def set_gguf_parameters(self):
+        super().set_gguf_parameters()
+        assert self.hparams_vision is not None
+
+        self.gguf_writer.add_clip_projector_type(gguf.VisionProjectorType.PI0)
+        self.gguf_writer.add_vision_attention_layernorm_eps(self.hparams_vision.get("layer_norm_eps", 1e-6))
+        self.gguf_writer.add_vision_use_gelu(self.hparams_vision.get("use_gelu", False))
+
+    def modify_tensors(self, data_torch: Tensor, name: str, bid: int | None) -> Iterable[tuple[str, Tensor]]:
+
+
 ###### CONVERSION LOGIC ######
 
 
@@ -10235,6 +10315,10 @@ def get_model_architecture(hparams: dict[str, Any], model_type: ModelType) -> st
     elif "ssm_cfg" in hparams:
         # For non-hf Mamba and Mamba2 models
         arch = hparams["ssm_cfg"].get("layer", "Mamba") + "ForCausalLM"
+    elif "type" in hparams:
+        # For vla models maybe?
+        # pi0 passed like this
+        arch = str(hparams["type"]).upper() + "ForConditionalGeneration"
 
     # if "architectures" is found in the sub-config, use that instead
     if model_type == ModelType.TEXT and text_config.get("architectures") is not None:

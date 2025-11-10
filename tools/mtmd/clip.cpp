@@ -609,6 +609,10 @@ struct clip_graph {
                 hparams.ffn_op,
                 -1);
 
+        } else if (ctx->proj_type() == PROJECTOR_TYPE_PI0) {
+            // a simple linear layer for PI0 projector
+            cur = ggml_mul_mat(ctx0, model.mm_0_w, cur);
+            cur = ggml_add(ctx0, cur, model.mm_0_b);
         } else {
             GGML_ABORT("SigLIP: Unsupported projector type");
         }

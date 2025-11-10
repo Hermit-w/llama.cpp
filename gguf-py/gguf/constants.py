@@ -427,6 +427,7 @@ class MODEL_ARCH(IntEnum):
     COGVLM           = auto()
     MINIMAXM2        = auto()
     PANGU_EMBED      = auto()
+    PI0              = auto()
 
 
 class VISION_PROJECTOR_TYPE(IntEnum):
@@ -439,6 +440,7 @@ class VISION_PROJECTOR_TYPE(IntEnum):
     GEMMA3    = auto()
     QWEN3VL   = auto()
     COGVLM    = auto()
+    PI0       = auto()
 
 
 class MODEL_TENSOR(IntEnum):
@@ -689,6 +691,46 @@ class MODEL_TENSOR(IntEnum):
     NEXTN_HNORM          = auto()
     NEXTN_SHARED_HEAD_HEAD = auto()
     NEXTN_SHARED_HEAD_NORM = auto()
+    # PI0 Specific all tensors
+    # LLM backbone part
+    PI0_VLM_OUTPUT       = auto()
+    PI0_VLM_ATTN_NORM    = auto()
+    PI0_VLM_ATTN_Q       = auto()
+    PI0_VLM_ATTN_K       = auto()
+    PI0_VLM_ATTN_V       = auto()
+    PI0_VLM_ATTN_OUT     = auto()
+    PI0_VLM_FFN_NORM     = auto()
+    PI0_VLM_FFN_GATE     = auto()
+    PI0_VLM_FFN_DOWN     = auto()
+    PI0_VLM_FFN_UP       = auto()
+    PI0_VLM_OUTPUT_NORM  = auto()
+    # Vision encoder part
+    PI0_V_ENC_EMBD_PATCH = auto()
+    PI0_V_ENC_EMBD_POS   = auto()
+    PI0_V_ENC_INPUT_NORM = auto()
+    PI0_V_ENC_ATTN_Q     = auto()
+    PI0_V_ENC_ATTN_K     = auto()
+    PI0_V_ENC_ATTN_V     = auto()
+    PI0_V_ENC_ATTN_O     = auto()
+    PI0_V_ENC_POST_ATTN_NORM = auto()
+    PI0_V_ENC_FFN_UP     = auto()
+    PI0_V_ENC_FFN_DOWN   = auto()
+    PI0_V_POST_NORM      = auto()
+    PI0_V_MMPROJ_FC      = auto()
+    # Action encoder part
+    PI0_A_ENC_FC         = auto()
+    # Action expert part
+    PI0_EXPERT_OUTPUT    = auto()
+    PI0_EXPERT_ATTN_NORM = auto()
+    PI0_EXPERT_ATTN_Q    = auto()
+    PI0_EXPERT_ATTN_K    = auto()
+    PI0_EXPERT_ATTN_V    = auto()
+    PI0_EXPERT_ATTN_OUT  = auto()
+    PI0_EXPERT_FFN_NORM  = auto()
+    PI0_EXPERT_FFN_GATE  = auto()
+    PI0_EXPERT_FFN_DOWN  = auto()
+    PI0_EXPERT_FFN_UP    = auto()
+    PI0_EXPERT_OUTPUT_NORM = auto()
 
 
 MODEL_ARCH_NAMES: dict[MODEL_ARCH, str] = {
@@ -795,6 +837,7 @@ MODEL_ARCH_NAMES: dict[MODEL_ARCH, str] = {
     MODEL_ARCH.MINIMAXM2:        "minimax-m2",
     MODEL_ARCH.COGVLM:           "cogvlm",
     MODEL_ARCH.PANGU_EMBED:      "pangu-embedded",
+    MODEL_ARCH.PI0:              "pi0",
 }
 
 VISION_PROJECTOR_TYPE_NAMES: dict[VISION_PROJECTOR_TYPE, str] = {
@@ -805,6 +848,7 @@ VISION_PROJECTOR_TYPE_NAMES: dict[VISION_PROJECTOR_TYPE, str] = {
     VISION_PROJECTOR_TYPE.GLM_EDGE:  "adapter",
     VISION_PROJECTOR_TYPE.MERGER:    "qwen2vl_merger",
     VISION_PROJECTOR_TYPE.GEMMA3:    "gemma3",
+    VISION_PROJECTOR_TYPE.PI0:       "pi0",
 }
 
 TENSOR_NAMES: dict[MODEL_TENSOR, str] = {
@@ -1055,6 +1099,46 @@ TENSOR_NAMES: dict[MODEL_TENSOR, str] = {
     MODEL_TENSOR.NEXTN_HNORM:               "blk.{bid}.nextn.hnorm",
     MODEL_TENSOR.NEXTN_SHARED_HEAD_HEAD:    "blk.{bid}.nextn.shared_head_head",
     MODEL_TENSOR.NEXTN_SHARED_HEAD_NORM:    "blk.{bid}.nextn.shared_head_norm",
+    # PI0 model
+    # LLM backbone part
+    MODEL_TENSOR.PI0_VLM_OUTPUT:            "pi0.vlm.output",
+    MODEL_TENSOR.PI0_VLM_ATTN_NORM:         "pi0.vlm.blk.{bid}.attn_norm",
+    MODEL_TENSOR.PI0_VLM_ATTN_Q:            "pi0.vlm.blk.{bid}.attn_q",
+    MODEL_TENSOR.PI0_VLM_ATTN_K:            "pi0.vlm.blk.{bid}.attn_k",
+    MODEL_TENSOR.PI0_VLM_ATTN_V:            "pi0.vlm.blk.{bid}.attn_v",
+    MODEL_TENSOR.PI0_VLM_ATTN_OUT:          "pi0.vlm.blk.{bid}.attn_output",
+    MODEL_TENSOR.PI0_VLM_FFN_NORM:          "pi0.vlm.blk.{bid}.ffn_norm",
+    MODEL_TENSOR.PI0_VLM_FFN_GATE:          "pi0.vlm.blk.{bid}.ffn_gate",
+    MODEL_TENSOR.PI0_VLM_FFN_DOWN:          "pi0.vlm.blk.{bid}.ffn_down",
+    MODEL_TENSOR.PI0_VLM_FFN_UP:            "pi0.vlm.blk.{bid}.ffn_up",
+    MODEL_TENSOR.PI0_VLM_OUTPUT_NORM:       "pi0.vlm.output_ln",
+    # Vision projector part
+    MODEL_TENSOR.PI0_V_ENC_EMBD_PATCH:      "pi0.vision.patch_embd",
+    MODEL_TENSOR.PI0_V_ENC_EMBD_POS:        "pi0.vision.position_embd",
+    MODEL_TENSOR.PI0_V_ENC_INPUT_NORM:      "pi0.vision.blk.{bid}.ln1",
+    MODEL_TENSOR.PI0_V_ENC_ATTN_Q:          "pi0.vision.blk.{bid}.attn_q",
+    MODEL_TENSOR.PI0_V_ENC_ATTN_K:          "pi0.vision.blk.{bid}.attn_k",
+    MODEL_TENSOR.PI0_V_ENC_ATTN_V:          "pi0.vision.blk.{bid}.attn_v",
+    MODEL_TENSOR.PI0_V_ENC_ATTN_O:          "pi0.vision.blk.{bid}.attn_out",
+    MODEL_TENSOR.PI0_V_ENC_POST_ATTN_NORM:  "pi0.vision.blk.{bid}.ln2",
+    MODEL_TENSOR.PI0_V_ENC_FFN_UP:          "pi0.vision.blk.{bid}.ffn_up",
+    MODEL_TENSOR.PI0_V_ENC_FFN_DOWN:        "pi0.vision.blk.{bid}.ffn_down",
+    MODEL_TENSOR.PI0_V_POST_NORM:           "pi0.vision.post_ln",
+    MODEL_TENSOR.PI0_V_MMPROJ_FC:           "pi0.vision.mm.fc",
+    # Action dense projector part
+    MODEL_TENSOR.PI0_A_ENC_FC:              "pi0.action.enc.fc",
+    # Action expert part
+    MODEL_TENSOR.PI0_EXPERT_OUTPUT:         "pi0.expert.output",
+    MODEL_TENSOR.PI0_EXPERT_ATTN_NORM:      "pi0.expert.blk.{bid}.attn_norm",
+    MODEL_TENSOR.PI0_EXPERT_ATTN_Q:         "pi0.expert.blk.{bid}.attn_q",
+    MODEL_TENSOR.PI0_EXPERT_ATTN_K:         "pi0.expert.blk.{bid}.attn_k",
+    MODEL_TENSOR.PI0_EXPERT_ATTN_V:         "pi0.expert.blk.{bid}.attn_v",
+    MODEL_TENSOR.PI0_EXPERT_ATTN_OUT:       "pi0.expert.blk.{bid}.attn_output",
+    MODEL_TENSOR.PI0_EXPERT_FFN_NORM:       "pi0.expert.blk.{bid}.ffn_norm",
+    MODEL_TENSOR.PI0_EXPERT_FFN_GATE:       "pi0.expert.blk.{bid}.ffn_gate",
+    MODEL_TENSOR.PI0_EXPERT_FFN_DOWN:       "pi0.expert.blk.{bid}.ffn_down",
+    MODEL_TENSOR.PI0_EXPERT_FFN_UP:         "pi0.expert.blk.{bid}.ffn_up",
+    MODEL_TENSOR.PI0_EXPERT_OUTPUT_NORM:    "pi0.expert.output_ln",
 }
 
 MODEL_TENSORS: dict[MODEL_ARCH, list[MODEL_TENSOR]] = {
@@ -2975,6 +3059,43 @@ MODEL_TENSORS: dict[MODEL_ARCH, list[MODEL_TENSOR]] = {
         MODEL_TENSOR.FFN_UP,
     ],
     # TODO
+    MODEL_ARCH.PI0: [
+        MODEL_TENSOR.PI0_VLM_OUTPUT,
+        MODEL_TENSOR.PI0_VLM_ATTN_NORM,
+        MODEL_TENSOR.PI0_VLM_ATTN_Q,
+        MODEL_TENSOR.PI0_VLM_ATTN_K,
+        MODEL_TENSOR.PI0_VLM_ATTN_V,
+        MODEL_TENSOR.PI0_VLM_ATTN_OUT,
+        MODEL_TENSOR.PI0_VLM_FFN_NORM,
+        MODEL_TENSOR.PI0_VLM_FFN_GATE,
+        MODEL_TENSOR.PI0_VLM_FFN_DOWN,
+        MODEL_TENSOR.PI0_VLM_FFN_UP,
+        MODEL_TENSOR.PI0_VLM_OUTPUT_NORM,
+        MODEL_TENSOR.PI0_V_ENC_EMBD_PATCH,
+        MODEL_TENSOR.PI0_V_ENC_EMBD_POS,
+        MODEL_TENSOR.PI0_V_ENC_INPUT_NORM,
+        MODEL_TENSOR.PI0_V_ENC_ATTN_Q,
+        MODEL_TENSOR.PI0_V_ENC_ATTN_K,
+        MODEL_TENSOR.PI0_V_ENC_ATTN_V,
+        MODEL_TENSOR.PI0_V_ENC_ATTN_O,
+        MODEL_TENSOR.PI0_V_ENC_POST_ATTN_NORM,
+        MODEL_TENSOR.PI0_V_ENC_FFN_UP,
+        MODEL_TENSOR.PI0_V_ENC_FFN_DOWN,
+        MODEL_TENSOR.PI0_V_POST_NORM,
+        MODEL_TENSOR.PI0_V_MMPROJ_FC,
+        MODEL_TENSOR.PI0_A_ENC_FC,
+        MODEL_TENSOR.PI0_EXPERT_OUTPUT,
+        MODEL_TENSOR.PI0_EXPERT_ATTN_NORM,
+        MODEL_TENSOR.PI0_EXPERT_ATTN_Q,
+        MODEL_TENSOR.PI0_EXPERT_ATTN_K,
+        MODEL_TENSOR.PI0_EXPERT_ATTN_V,
+        MODEL_TENSOR.PI0_EXPERT_ATTN_OUT,
+        MODEL_TENSOR.PI0_EXPERT_FFN_NORM,
+        MODEL_TENSOR.PI0_EXPERT_FFN_GATE,
+        MODEL_TENSOR.PI0_EXPERT_FFN_DOWN,
+        MODEL_TENSOR.PI0_EXPERT_FFN_UP,
+        MODEL_TENSOR.PI0_EXPERT_OUTPUT_NORM,
+    ]
 }
 
 # tensors that will not be serialized
@@ -3207,6 +3328,7 @@ class VisionProjectorType:
     LIGHTONOCR = "lightonocr"
     COGVLM = "cogvlm"
     JANUS_PRO = "janus_pro"
+    PI0 = "pi0"
 
 
 # Items here are (block size, type size)

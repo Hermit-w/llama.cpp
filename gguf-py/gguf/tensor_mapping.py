@@ -119,6 +119,43 @@ class TensorNameMap:
         MODEL_TENSOR.CONV1D: (
             "backbone.embed", # roberta
         ),
+
+        # PI0 related tensors
+        MODEL_TENSOR.PI0_VLM_OUTPUT: (
+            "model.paligemma_with_expert.paligemma.lm_head",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_OUTPUT_NORM: (
+            "model.paligemma_with_expert.paligemma.model.language_model.norm",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_EMBD_PATCH: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.embeddings.patch_embedding",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_EMBD_POS: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.embeddings.position_embedding",
+        ),
+
+        MODEL_TENSOR.PI0_V_POST_NORM: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.post_layernorm",
+        ),
+
+        MODEL_TENSOR.PI0_V_MMPROJ_FC: (
+            "model.paligemma_with_expert.paligemma.model.multi_modal_projector.linear",
+        ),
+
+        MODEL_TENSOR.PI0_A_ENC_FC: (
+            "model.state_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_OUTPUT: (
+            "model.paligemma_with_expert.gemma_expert.lm_head",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_OUTPUT_NORM: (
+            "model.paligemma_with_expert.gemma_expert.model.norm",
+        ),
     }
 
     block_mappings_cfg: dict[MODEL_TENSOR, tuple[str, ...]] = {
@@ -1575,6 +1612,111 @@ class TensorNameMap:
 
         MODEL_TENSOR.NEXTN_SHARED_HEAD_NORM: (
             "model.layers.{bid}.shared_head.norm",
+        ),
+
+        # PI0 model tensors
+        MODEL_TENSOR.PI0_VLM_ATTN_NORM: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.input_layernorm",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_ATTN_Q: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.self_attn.q_proj",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_ATTN_K: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.self_attn.k_proj",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_ATTN_V: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.self_attn.v_proj",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_ATTN_OUT: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.self_attn.o_proj",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_FFN_NORM: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.post_attention_layernorm",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_FFN_GATE: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.mlp.gate_proj",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_FFN_DOWN: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.mlp.down_proj",
+        ),
+
+        MODEL_TENSOR.PI0_VLM_FFN_UP: (
+            "model.paligemma_with_expert.paligemma.model.language_model.layers.{bid}.mlp.up_proj",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_INPUT_NORM: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.layer_norm1",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_ATTN_Q: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.self_attn.q_proj",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_ATTN_K: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.self_attn.k_proj",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_ATTN_V: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.self_attn.v_proj",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_ATTN_O: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.self_attn.out_proj",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_POST_ATTN_NORM: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.layer_norm2",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_FFN_UP: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.mlp.fc1",
+        ),
+
+        MODEL_TENSOR.PI0_V_ENC_FFN_DOWN: (
+            "model.paligemma_with_expert.paligemma.model.vision_tower.vision_model.encoder.layers.{bid}.mlp.fc2",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_ATTN_NORM: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.input_layernorm",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_ATTN_Q: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.self_attn.q_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_ATTN_K: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.self_attn.k_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_ATTN_V: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.self_attn.v_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_ATTN_OUT: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.self_attn.o_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_FFN_NORM: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.post_attention_layernorm",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_FFN_GATE: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.mlp.gate_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_FFN_DOWN: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.mlp.down_proj",
+        ),
+
+        MODEL_TENSOR.PI0_EXPERT_FFN_UP: (
+            "model.paligemma_with_expert.gemma_expert.model.layers.{bid}.mlp.up_proj",
         ),
     }
 
